@@ -1,0 +1,75 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+
+/* Reset CSS */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Reset styles for full-page gradient */
+html, body, #root {
+  margin: 0;
+  padding: 0;
+  height: 100%; /* Ensure full height */
+  width: 100%; /* Ensure full width */
+  background: linear-gradient(to right, #3b82f6, #6366f1); /* Gradient */
+  background-repeat: no-repeat;
+  background-attachment: fixed; /* Keeps gradient static during scroll */
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif; /* Optional: Set a global font */
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+
+
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/* Tailwind Overrides (Optional) */
+.bg-gradient-to-r {
+  background: linear-gradient(to right, #4f46e5, #6d28d9);
+}
+
+.bg-gradient-to-tr {
+  background: linear-gradient(to top right, #4f46e5, #9333ea);
+}
+
+button {
+  cursor: pointer;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
