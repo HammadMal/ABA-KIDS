@@ -1,111 +1,20 @@
-import React, { useState,useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router';
-
 import axios from 'axios';
 
 const AdminPortal = () => {
-
   const navigate = useNavigate();
 
-  const fetchDoctors = async () => {
-    try {
-      const response = await axios.get('http://localhost:5000/doctors');
-      console.log("Fetched doctors:", response.data); // Debug log
-
-      setDoctors(response.data);
-    } catch (error) {
-      console.error('Error fetching doctors:', error);
-      setDoctors([]);
-    }
-  };
-  
-  const fetchPatients = async () => {
-    try {
-      const response = await axios.get('http://localhost:5000/patients');
-      setPatients(response.data);
-    } catch (error) {
-      console.error('Error fetching patients:', error);
-    }
-  };
-
-  const addDoctor = async (doctorData) => {
-    console.log("Payload being sent to backend:", doctorData); // Debugging
-  
-    try {
-      await axios.post('http://localhost:5000/doctors', doctorData);
-      fetchDoctors(); // Refresh the list
-      alert('Doctor added successfully!');
-    } catch (error) {
-      console.error('Error adding doctor:', error);
-    }
-  };
-  
-  const addPatient = async (patientData) => {
-    try {
-      await axios.post('http://localhost:5000/patients', patientData);
-      fetchPatients(); // Refresh the list
-      alert('Patient added successfully!');
-    } catch (error) {
-      console.error('Error adding patient:', error);
-    }
-  };
-  
-  const deleteDoctor = async (id) => {
-    try {
-      await axios.delete(`http://localhost:5000/doctors/${id}`);
-      fetchDoctors(); // Refresh the list
-      alert('Doctor deleted successfully!');
-    } catch (error) {
-      console.error('Error deleting doctor:', error);
-    }
-  };
-  
-  const deletePatient = async (id) => {
-    try {
-      await axios.delete(`http://localhost:5000/patients/${id}`);
-      fetchPatients(); // Refresh the list
-      alert('Patient deleted successfully!');
-    } catch (error) {
-      console.error('Error deleting patient:', error);
-    }
-  };
-  
-  const handleDoctorSubmit = (e) => {
-    e.preventDefault();
-    const formData = new FormData(e.target);
-    const doctorData = Object.fromEntries(formData.entries());
-  
-    // Convert checkbox to Boolean
-    doctorData.nonbillable = formData.get('nonbillable') === 'on';
-  
-    console.log("Doctor data being sent:", doctorData); // Debugging
-    addDoctor(doctorData);
-  };
-  
-  
-  const handlePatientSubmit = (e) => {
-    e.preventDefault();
-    const formData = new FormData(e.target);
-    const patientData = Object.fromEntries(formData.entries());
-    addPatient(patientData);
-  };
-  
-
-  useEffect(() => {
-    fetchDoctors();
-    fetchPatients();
-  }, []);
-
-
-
-  
+  // State for managing the form
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [activeTab, setActiveTab] = useState('');
   const [doctorSubTab, setDoctorSubTab] = useState('');
   const [patientSubTab, setPatientSubTab] = useState('');
-
   const [doctors, setDoctors] = useState([]);
   const [patients, setPatients] = useState([]);
+
+  // State for managing the doctor form
+  const [fullTime, setFullTime] = useState(false); // Add this line
 
   // Hardcoded login credentials
   const hardcodedEmail = "abbas@gmail.com";
@@ -115,6 +24,123 @@ const AdminPortal = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
+  // Fetch doctors and patients
+  const fetchDoctors = async () => {
+    try {
+      const response = await axios.get('http://localhost:5000/doctors');
+      setDoctors(response.data);
+    } catch (error) {
+      console.error('Error fetching doctors:', error);
+      setDoctors([]);
+    }
+  };
+
+  const fetchPatients = async () => {
+    try {
+      const response = await axios.get('http://localhost:5000/patients');
+      setPatients(response.data);
+    } catch (error) {
+      console.error('Error fetching patients:', error);
+    }
+  };
+
+  // Add, delete doctors and patients
+  const addDoctor = async (doctorData) => {
+    try {
+      await axios.post('http://localhost:5000/doctors', doctorData);
+      fetchDoctors();
+      alert('Doctor added successfully!');
+    } catch (error) {
+      console.error('Error adding doctor:', error);
+    }
+  };
+
+  const addPatient = async (patientData) => {
+    try {
+      await axios.post('http://localhost:5000/patients', patientData);
+      fetchPatients();
+      alert('Patient added successfully!');
+    } catch (error) {
+      console.error('Error adding patient:', error);
+    }
+  };
+
+  const deleteDoctor = async (id) => {
+    try {
+      await axios.delete(`http://localhost:5000/doctors/${id}`);
+      fetchDoctors();
+      alert('Doctor deleted successfully!');
+    } catch (error) {
+      console.error('Error deleting doctor:', error);
+    }
+  };
+
+  const deletePatient = async (id) => {
+    try {
+      await axios.delete(`http://localhost:5000/patients/${id}`);
+      fetchPatients();
+      alert('Patient deleted successfully!');
+    } catch (error) {
+      console.error('Error deleting patient:', error);
+    }
+  };
+
+  // Handle form submissions
+  const handleDoctorSubmit = (e) => {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    const doctorData = {
+      name: formData.get('name'),
+      position: formData.get('position'),
+      colorCoding: formData.get('colorCoding'),
+      availability: {
+        Mon: formData.get('monAvailability') === 'on' ? { startTime: formData.get('monStartTime'), endTime: formData.get('monEndTime') } : null,
+        Tue: formData.get('tueAvailability') === 'on' ? { startTime: formData.get('tueStartTime'), endTime: formData.get('tueEndTime') } : null,
+        Wed: formData.get('wedAvailability') === 'on' ? { startTime: formData.get('wedStartTime'), endTime: formData.get('wedEndTime') } : null,
+        Thu: formData.get('thuAvailability') === 'on' ? { startTime: formData.get('thuStartTime'), endTime: formData.get('thuEndTime') } : null,
+        Fri: formData.get('friAvailability') === 'on' ? { startTime: formData.get('friStartTime'), endTime: formData.get('friEndTime') } : null,
+        Sat: formData.get('satAvailability') === 'on' ? { startTime: formData.get('satStartTime'), endTime: formData.get('satEndTime') } : null,
+        Sun: formData.get('sunAvailability') === 'on' ? { startTime: formData.get('sunStartTime'), endTime: formData.get('sunEndTime') } : null,
+      },
+      nonbillable: formData.get('nonbillable') === 'on',
+      priority: formData.get('priority') === 'on',
+      fullTime: formData.get('fullTime') === 'on',
+      maxHoursPerWeek: formData.get('fullTime') === 'on' ? null : parseInt(formData.get('maxHoursPerWeek'), 10),
+    };
+
+    console.log("Doctor data being sent:", doctorData); // Debugging
+    addDoctor(doctorData);
+  };
+
+  const handlePatientSubmit = (e) => {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    const patientData = {
+      name: formData.get('name'),
+      location: formData.get('location'),
+      approvedHours: parseInt(formData.get('approvedHours'), 10),
+      availability: {
+        Mon: formData.get('monAvailability') === 'on' ? { startTime: formData.get('monStartTime'), endTime: formData.get('monEndTime') } : null,
+        Tue: formData.get('tueAvailability') === 'on' ? { startTime: formData.get('tueStartTime'), endTime: formData.get('tueEndTime') } : null,
+        Wed: formData.get('wedAvailability') === 'on' ? { startTime: formData.get('wedStartTime'), endTime: formData.get('wedEndTime') } : null,
+        Thu: formData.get('thuAvailability') === 'on' ? { startTime: formData.get('thuStartTime'), endTime: formData.get('thuEndTime') } : null,
+        Fri: formData.get('friAvailability') === 'on' ? { startTime: formData.get('friStartTime'), endTime: formData.get('friEndTime') } : null,
+        Sat: formData.get('satAvailability') === 'on' ? { startTime: formData.get('satStartTime'), endTime: formData.get('satEndTime') } : null,
+        Sun: formData.get('sunAvailability') === 'on' ? { startTime: formData.get('sunStartTime'), endTime: formData.get('sunEndTime') } : null,
+      },
+    };
+
+    console.log("Patient data being sent:", patientData); // Debugging
+    addPatient(patientData);
+  };
+
+  // Fetch data on component mount
+  useEffect(() => {
+    fetchDoctors();
+    fetchPatients();
+  }, []);
+
+  // Login handler
   const handleLogin = (e) => {
     e.preventDefault();
     if (email === hardcodedEmail && password === hardcodedPassword) {
@@ -124,6 +150,7 @@ const AdminPortal = () => {
     }
   };
 
+  // Render login form
   const renderLoginForm = () => (
     <div className="w-full h-screen flex flex-col items-center bg-gradient-to-br from-blue-50 to-blue-100 relative">
       <div className="absolute top-0 left-0 w-40 h-40 bg-blue-300 rounded-full opacity-20"></div>
@@ -168,6 +195,7 @@ const AdminPortal = () => {
     </div>
   );
 
+  // Render doctor tab
   const renderDoctorTab = () => (
     <div>
       <h2 className="text-2xl font-bold mb-4 text-gray-800">Doctor Options</h2>
@@ -229,31 +257,31 @@ const AdminPortal = () => {
               />
             </div>
             <div className="mb-4">
-              <label className="block mb-2 text-sm font-medium">Availability (M-Sat)</label>
-              <input
-                name="availability"
-                type="text"
-                className="w-full p-3 border border-gray-300 rounded-lg"
-                placeholder="e.g., Mon-Fri"
-                required
-              />
-            </div>
-            <div className="mb-4">
-              <label className="block mb-2 text-sm font-medium">Start Time - End Time</label>
-              <div className="flex gap-2">
-                <input
-                  name="startTime"
-                  type="time"
-                  className="w-full p-3 border border-gray-300 rounded-lg"
-                  required
-                />
-                <input
-                  name="endTime"
-                  type="time"
-                  className="w-full p-3 border border-gray-300 rounded-lg"
-                  required
-                />
-              </div>
+              <label className="block mb-2 text-sm font-medium">Availability</label>
+              {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map(day => (
+                <div key={day} className="mb-2">
+                  <label className="flex items-center">
+                    <input
+                      name={`${day.toLowerCase()}Availability`}
+                      type="checkbox"
+                      className="mr-2"
+                    />
+                    {day}
+                  </label>
+                  <div className="flex gap-2 ml-6">
+                    <input
+                      name={`${day.toLowerCase()}StartTime`}
+                      type="time"
+                      className="w-full p-3 border border-gray-300 rounded-lg"
+                    />
+                    <input
+                      name={`${day.toLowerCase()}EndTime`}
+                      type="time"
+                      className="w-full p-3 border border-gray-300 rounded-lg"
+                    />
+                  </div>
+                </div>
+              ))}
             </div>
             <div className="mb-4">
               <label className="flex items-center">
@@ -264,6 +292,37 @@ const AdminPortal = () => {
                 />
                 Nonbillable Hours
               </label>
+            </div>
+            <div className="mb-4">
+              <label className="flex items-center">
+                <input
+                  name="priority"
+                  type="checkbox"
+                  className="mr-2"
+                />
+                Priority
+              </label>
+            </div>
+            <div className="mb-4">
+              <label className="flex items-center">
+                <input
+                  name="fullTime"
+                  type="checkbox"
+                  className="mr-2"
+                  checked={fullTime}
+                  onChange={(e) => setFullTime(e.target.checked)}
+                />
+                Full Time
+              </label>
+            </div>
+            <div className="mb-4">
+              <label className="block mb-2 text-sm font-medium">Max Hours Per Week (if part-time)</label>
+              <input
+                name="maxHoursPerWeek"
+                type="number"
+                className="w-full p-3 border border-gray-300 rounded-lg"
+                disabled={fullTime}
+              />
             </div>
             <button
               type="submit"
@@ -284,7 +343,6 @@ const AdminPortal = () => {
                   key={doctor._id}
                   className="flex justify-between items-center p-4 bg-gray-100 rounded-lg shadow"
                 >
-                  {/* Render specific properties of the doctor */}
                   <span className="text-gray-800">{`${doctor.name} - ${doctor.position}`}</span>
                   <button
                     onClick={() => deleteDoctor(doctor._id)}
@@ -299,8 +357,8 @@ const AdminPortal = () => {
       )}
     </div>
   );
-  
 
+  // Render patient tab
   const renderPatientTab = () => (
     <div>
       <h2 className="text-2xl font-bold mb-4 text-gray-800">Patient Options</h2>
@@ -349,17 +407,44 @@ const AdminPortal = () => {
               >
                 <option value="School">School</option>
                 <option value="Clinic">Clinic</option>
+                <option value="Home">Home</option>
               </select>
             </div>
             <div className="mb-4">
-              <label className="block mb-2 text-sm font-medium">Availability</label>
+              <label className="block mb-2 text-sm font-medium">Approved Hours</label>
               <input
-                name="availability"
-                type="text"
+                name="approvedHours"
+                type="number"
                 className="w-full p-3 border border-gray-300 rounded-lg"
-                placeholder="e.g., Mon-Fri"
                 required
               />
+            </div>
+            <div className="mb-4">
+              <label className="block mb-2 text-sm font-medium">Availability</label>
+              {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map(day => (
+                <div key={day} className="mb-2">
+                  <label className="flex items-center">
+                    <input
+                      name={`${day.toLowerCase()}Availability`}
+                      type="checkbox"
+                      className="mr-2"
+                    />
+                    {day}
+                  </label>
+                  <div className="flex gap-2 ml-6">
+                    <input
+                      name={`${day.toLowerCase()}StartTime`}
+                      type="time"
+                      className="w-full p-3 border border-gray-300 rounded-lg"
+                    />
+                    <input
+                      name={`${day.toLowerCase()}EndTime`}
+                      type="time"
+                      className="w-full p-3 border border-gray-300 rounded-lg"
+                    />
+                  </div>
+                </div>
+              ))}
             </div>
             <button
               type="submit"
@@ -380,7 +465,6 @@ const AdminPortal = () => {
                   key={patient._id}
                   className="flex justify-between items-center p-4 bg-gray-100 rounded-lg shadow"
                 >
-                  {/* Render specific properties of the patient */}
                   <span className="text-gray-800">{`${patient.name} - ${patient.location}`}</span>
                   <button
                     onClick={() => deletePatient(patient._id)}
@@ -395,11 +479,9 @@ const AdminPortal = () => {
       )}
     </div>
   );
-  
 
+  // Render admin panel
   const renderAdminPanel = () => (
-
-  
     <div className="w-full h-screen flex flex-col items-center bg-blue p-10">
       <h1 className="text-4xl font-extrabold mb-8 text-white">Admin Portal</h1>
       <div className="flex gap-4 mb-12">
@@ -439,14 +521,14 @@ const AdminPortal = () => {
         {activeTab === 'Patient' && renderPatientTab()}
         {activeTab === 'Schedule' && (
           <div>
-          <h2 className="text-2xl font-bold mb-4 text-gray-800">Manage Schedule</h2>
-          <button
-            onClick={() => navigate('/schedule')} // Route to Schedule component
-            className="bg-green-500 text-white py-2 px-6 rounded-lg hover:bg-green-600 transition"
-          >
-            Generate Schedule
-          </button>
-        </div>
+            <h2 className="text-2xl font-bold mb-4 text-gray-800">Manage Schedule</h2>
+            <button
+              onClick={() => navigate('/schedule')}
+              className="bg-green-500 text-white py-2 px-6 rounded-lg hover:bg-green-600 transition"
+            >
+              Generate Schedule
+            </button>
+          </div>
         )}
       </div>
     </div>

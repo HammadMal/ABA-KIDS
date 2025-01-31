@@ -1,0 +1,50 @@
+### Summary of Doctor-Patient Pairing Process
+
+1. **Calculate Available Hours:**
+   - A function (`calculateAvailableHours`) calculates the total available hours for a doctor based on their schedule. This is done by subtracting the start time from the end time for each day and summing up the hours for all days the doctor is available.
+
+2. **Match Full-Time Doctors First:**
+   - The pairing process first attempts to match **full-time doctors** with **patients** based on availability and required hours:
+     - For each **patient**, their availability is compared with each **doctor's** schedule to see if there is a matching time slot.
+     - The doctor's availability on specific days is checked, and if the patient's required hours can be fully matched by a doctor's time slot, the pairing occurs.
+     - The `remainingHours` of the patient are reduced as the hours get paired with the doctor.
+     - Once a full-time doctor has matched a patient for their required hours, the doctor is no longer considered for the same patient.
+
+3. **Match Part-Time Doctors if Needed:**
+   - If there are still **remaining hours** to be paired after attempting full-time doctors, the system looks at **part-time doctors**.
+     - Part-time doctors are considered based on their weekly hour limit (`maxHoursPerWeek`), and their availability is checked just like full-time doctors.
+     - Part-time doctors who have available hours and can match the remaining hours are then considered for pairing with the patient.
+     - Once part-time doctors have been matched with patients, the remaining hours for that patient are updated accordingly.
+
+4. **Final Pairing:**
+   - The result of the pairing process is a list of pairings between doctors and patients, with each pairing showing which doctor is assigned to which patient based on availability and required hours.
+   - The pairing process ensures that full-time doctors are prioritized over part-time doctors.
+
+### Key Conditions for Pairing:
+- Full-time doctors are considered first.
+- Part-time doctors are only considered if there are remaining hours to be paired.
+- The pairing respects both doctors' availability and patients' required hours.
+
+
+
+1. Prioritization Strategy:
+- First attempts to pair patients with full-time priority doctors
+- Tries to match doctors and patients with overlapping available time slots
+- Assigns hours based on the maximum possible overlap between doctor and patient schedules
+
+2. Matching Process:
+- Sorts patients by highest hours needed first
+- Checks time slot compatibility
+- Tracks total hours assigned to each doctor
+- Prevents double-booking by checking time slot availability
+
+3. Fallback Mechanism:
+- If full-time priority doctors can't fully cover a patient's hours, switches to part-time doctors
+- Ensures part-time doctors don't exceed their weekly hour limit
+
+4. Tracking and Constraints:
+- Precisely calculates time overlaps in minutes
+- Limits assignments based on:
+  - Patient's approved hours
+  - Doctor's availability
+  - Doctor's weekly hour constraints
